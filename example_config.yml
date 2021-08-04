@@ -1,0 +1,75 @@
+# MIT License
+#
+# Copyright (c) 2021 Université Paris-Saclay
+# Copyright (c) 2021 Laboratoire national de métrologie et d'essais (LNE)
+# Copyright (c) 2021 CNRS
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# This YAML file is an example of a valid configuration file with sensible defaults
+# It should be copied to an experiment directory and modified accordingly
+
+dataset:
+  # Path to TSV files for train, dev and test
+  path: '/path/to/tsv/files'
+  # Special slot label value specifying that the token
+  # should be ignored during loss and performance calculation
+  ignore_index: -100
+  # Whether to remove utterances whose length doesn't match slot labels length
+  remove_bad_alignments: true
+  # Whether to lowercase utterances
+  do_lowercase: true
+  # Whether to label all subwords or only the first one and ignore the others
+  label_all_subwords: false
+
+model:
+  # Model name (huggingface) or path to model checkpoint directory to load the model and tokenizer.
+  # If it's a name, it will download the checkpoint from huggingface.co
+  name_or_path: 'bert-base-multilingual-cased'
+
+# Path to seqeval.py script to load the metric locally (offline mode).
+# Download the original script: https://github.com/huggingface/datasets/blob/master/metrics/seqeval/seqeval.py
+# Remove the value to load it from huggingface.co when used.
+# seqeval_path: '/path/to/seqeval.py'
+
+train:
+  # Fix seed for reproducibility
+  seed: 1
+  # Batch size to use during training
+  batch_size: 32
+  # Validation metric to look at for model selection: intent_acc|slot_f1|loss. Defaults to 'slot_f1'
+  validation_metric: 'slot_f1'
+  # Whether train for intent detection as well as slot filling. Defaults to False
+  do_intent_detection: false
+  # Whether to freeze BERT weights. Defaults to False
+  freeze_bert: false
+  # The dropout probability to use on output embeddings before classification. float. Defaults to 0.1.
+  dropout: 0.1
+  # Learning rate to train the model. float. Defaults to 1e-5.
+  learning_rate: 1e-5
+  # The weight to give to the slot filling loss during training. float. Defaults to 1.
+  slot_loss_coeff: 1
+  # The number of epochs to train each language. Defaults to 20.
+  epochs_per_lang: 20
+  # The number of workers to use for data fetching. Optional, defaults to half the number of processors.
+  num_workers: 4
+  # Whether to keep intermediate checkpoints in disk. Can be deactivated to save disk space. Defaults to False.
+  keep_intermediate_checkpoints: false
+  # The sequence of languages to train on. If empty, will generate a random sequence of all available languages.
+  sequence: ['DE', 'FR', 'PT', 'HI', 'ES', 'TR', 'EN', 'JA', 'ZH']
