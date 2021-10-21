@@ -177,10 +177,10 @@ class ContinualTrainer:
     def train(self, model: MultiBERTForNLU, lang_sequence: Optional[List[Text]] = None, **kwargs):
         # Resolve the training sequence. Priority: argument -> config -> random sequence
         if lang_sequence is None:
-            if self.config.sequence is None or not self.config.sequence:
+            if self.config.languages is None or not self.config.languages:
                 raise ValueError("A language sequence must be provided as argument or in config.yml")
             else:
-                lang_sequence = self.config.sequence
+                lang_sequence = self.config.languages
 
         print("Training Sequence:", " -> ".join(lang_sequence))
 

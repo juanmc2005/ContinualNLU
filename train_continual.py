@@ -52,7 +52,7 @@ print("Available languages:", dataset.available_langs)
 
 # Add custom plugins
 plugins = []
-if not config.train.keep_intermediate_checkpoints:
+if not config.train.keep_checkpoints:
     plugins.append(CheckpointCleaner(keep_last=False))
 
 # Build monolingual trainer
@@ -61,7 +61,7 @@ trainer = MonolingualTrainer(dataset, config, log_dir)
 # Build continual learning trainer
 trainer = ContinualTrainer(trainer, dataset, config, plugins)
 
-print('Specified training sequence:', config.train.sequence)
+print('Specified training sequence:', config.train.languages)
 print()
 
 # Train the model

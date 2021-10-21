@@ -22,8 +22,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import random
 from pathlib import Path
+import random
+from re import match
 from typing import Union, Text
 
 import numpy as np
@@ -81,3 +82,22 @@ def fix_seed(seed: int = 42):
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+
+def valid_dirs_in(path: Path, pattern):
+    for d in path.iterdir():
+        if d.is_dir() and match(pattern, d.name):
+            yield d
+
+
+def get_checkpoint_path(root: Path) -> Path:
+    ckpt_path = root / "logs"
+    last_lang_dirs = list(valid_dirs_in(ckpt_path, pattern=r"8_[A-Z]{2}"))
+    assert len(last_lang_dirs) == 1, f"Found {len(last_lang_dirs)} last language directories, but only 1 should exist"
+    ckpt_path = ckpt_path / last_lang_dirs[0] / "checkpoints"
+    ckpt_files = []
+    for path in ckpt_path.iterdir():
+        if path.is_file() and path.name.endswith(".ckpt"):
+            ckpt_files.append(path)
+    assert len(ckpt_files) == 1, f"Found {len(ckpt_files)} checkpoints but only 1 should exist"
+    return ckpt_files[0]
