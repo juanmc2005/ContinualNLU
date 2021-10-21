@@ -1,5 +1,5 @@
 # Cross-lingual Transfer in Natural Language Understanding
-Companion repository for the paper "A Study of Cross-lingual Transfer in Continual Natural Language Understanding"
+Companion repository for the paper "A Study of Cross-lingual Transfer in Continual Natural Language Understanding".
 
 This project contains all the scripts and information needed to reproduce the experiments presented in the paper.
 
@@ -43,10 +43,10 @@ dataset:
 
 ### Offline mode
 
-If you try to run the experiments in **offline mode**, it will fail when trying to load the 
+If you try to run an experiment in **offline mode**, it will fail when trying to load the 
 configured BERT, the associated tokenizer and the seqeval script.
 To avoid this, do the following:
-1. Pre-download the chosen model and the associated tokenizer (needs an internet connexion):
+1. Pre-download the chosen model ('bert-base-multilingual-cased' is the one used in the paper) and the associated tokenizer (needs an internet connexion):
 ```python
 from pathlib import Path
 from utils import download_model
@@ -68,7 +68,7 @@ seqeval_path: '/path/to/seqeval.py'
 
 For each experiment, first copy in a new directory `example_config.yml` and rename it `config.yml`.
 
-All experiment were run using 5 different random seeds, that are `0`, `100`, `200`, `300` and `400`.
+All experiments were run using 5 different random seeds, that are `0`, `100`, `200`, `300` and `400`.
 The results were then averaged and the standard deviation was computed.
 To set the seed to use in an experiment, set the `train.seed` parameter in the config file.
 
@@ -86,7 +86,7 @@ The performance matrix is also automatically saved in
 
 Joint Transfer results can be obtained after running both monolingual and multilingual experiments.
 
-To train the model on one language only (monolingual), set the `train.languages` parameters in the config file as a list
+To train the model on one language only (monolingual), set the `train.languages` parameter in the config file as a list
 with only one string denoting the language you chose.
 
 E.g. to train the model on the English data: (excerpt from the config file)
@@ -148,7 +148,7 @@ of the sequence and averaged the results per language.
 
 To run a fast recovery experiment run the following:
 ```shell script
-python train_idd.py --dir path/to/config.yml/directory --from_ckpt --epochs 
+python train_idd.py --dir path/to/config.yml/directory --from_ckpt --epochs <num_epochs>
 ```
 
 The checkpoint saved during training in the directory containing the config file of the continual experiment will be 
