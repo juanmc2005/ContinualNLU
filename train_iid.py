@@ -64,14 +64,15 @@ print("Loading dataset... ", end="", flush=True)
 dataset = MultiATIS(config, MultiBERTTokenizer)
 print("OK")
 
-print("Loading model...   ", end="", flush=True)
 if args.from_ckpt:
+    print(f"Loading model from checkpoint {str(ckpt_path)}... ", end="", flush=True)
     model = MultiBERTForNLU.load_from_checkpoint(
         checkpoint_path=str(ckpt_path),
         dataset=dataset,
         config=config
     )
 else:
+    print("Loading model... ", end="", flush=True)
     model = MultiBERTForNLU(dataset, config)
 print("OK")
 
@@ -106,7 +107,7 @@ logger = TensorBoardLogger(save_dir=log_dir, name=None, version='logs')
 epochs = config.train.epochs_per_lang if not args.from_ckpt else args.epochs
 trainer = pl.Trainer(
     gpus=args.gpus,
-    max_epochs=config.train.epochs_per_lang,
+    max_epochs=epochs,
     num_sanity_val_steps=0,
     logger=logger,
     checkpoint_callback=True,

@@ -92,7 +92,9 @@ def valid_dirs_in(path: Path, pattern):
 
 def get_checkpoint_path(root: Path) -> Path:
     ckpt_path = root / "logs"
-    last_lang_dirs = list(valid_dirs_in(ckpt_path, pattern=r"8_[A-Z]{2}"))
+    lang_dirs = list(valid_dirs_in(ckpt_path, pattern=r"[0-9]{1}_[A-Z]{2}"))
+    last_lang_dirs = list(valid_dirs_in(ckpt_path, pattern=rf"{len(lang_dirs) - 1}_[A-Z]{{2}}"))
+    assert len(last_lang_dirs) != 0, f"The language directory with index {len(lang_dirs) - 1} does not exist"
     assert len(last_lang_dirs) == 1, f"Found {len(last_lang_dirs)} last language directories, but only 1 should exist"
     ckpt_path = ckpt_path / last_lang_dirs[0] / "checkpoints"
     ckpt_files = []
