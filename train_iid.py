@@ -23,7 +23,9 @@
 # SOFTWARE.
 
 import argparse
+import pandas as pd
 from pathlib import Path
+from shutil import rmtree
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -32,29 +34,52 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from dataset import MultiATIS
 from model import MultiBERTForNLU, MultiBERTTokenizer
 from config import Config
+from utils import get_checkpoint_path
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dir', type=str, required=True, help="Experiment directory where config.yml is located")
 parser.add_argument('--gpus', type=int, required=False, default=1, help="Number of gpus to train on")
+parser.add_argument('--from_ckpt', action='store_true', help="Whether to train from a checkpoint")
+parser.add_argument('--epochs', type=int, required=False, default=1, help="Number of training epochs")
 args = parser.parse_args()
 args.dir = Path(args.dir)
 
+log_dir = args.dir
+if args.from_ckpt:
+    ckpt_path = get_checkpoint_path(args.dir)
+    recovery_path = ckpt_path.parent / f"recovery_{args.epochs}_epochs_{ckpt_path.name[:-5]}"
+    if recovery_path.exists():
+        print(f"Removing existing directory {recovery_path.name}")
+        rmtree(recovery_path)
+    recovery_path.mkdir(exist_ok=False)
+    log_dir = recovery_path
+
 config = Config(args.dir / "config.yml")
 
-languages = config.train.sequence
-monolingual = len(languages) == 1
+languages = config.train.languages
+monolingual = len(languages) == 1 or args.from_ckpt
 
 print("Loading dataset... ", end="", flush=True)
 dataset = MultiATIS(config, MultiBERTTokenizer)
 print("OK")
 
-print("Loading model...   ", end="", flush=True)
-model = MultiBERTForNLU(dataset, config)
+if args.from_ckpt:
+    print(f"Loading model from checkpoint {str(ckpt_path)}... ", end="", flush=True)
+    model = MultiBERTForNLU.load_from_checkpoint(
+        checkpoint_path=str(ckpt_path),
+        dataset=dataset,
+        config=config
+    )
+else:
+    print("Loading model... ", end="", flush=True)
+    model = MultiBERTForNLU(dataset, config)
 print("OK")
 
 # TRAINING
-data_training = dataset[languages[0] if monolingual else 'all']
+train_lang = languages[0] if monolingual else 'all'
+print("Will train on:", train_lang)
+data_training = dataset[train_lang]
 train_loader = data_training.get_loader(
     split='train',
     batch_size=config.train.batch_size,
@@ -73,14 +98,16 @@ validation_metric = config.train.validation_metric
 checkpoint_callback = ModelCheckpoint(
     monitor=f"dev_{validation_metric}",
     mode="min" if validation_metric == "loss" else "max",
-    save_top_k=1
+    save_top_k=1,
+    dirpath=log_dir if args.from_ckpt else None
 )
 
 # The checkpoints and logging files are automatically saved in save_dir
-logger = TensorBoardLogger(save_dir=args.dir, name=None, version='logs')
+logger = TensorBoardLogger(save_dir=log_dir, name=None, version='logs')
+epochs = config.train.epochs_per_lang if not args.from_ckpt else args.epochs
 trainer = pl.Trainer(
     gpus=args.gpus,
-    max_epochs=config.train.epochs_per_lang,
+    max_epochs=epochs,
     num_sanity_val_steps=0,
     logger=logger,
     checkpoint_callback=True,
@@ -107,6 +134,7 @@ print("OK")
 if not monolingual:
     languages.append('all')
 
+performance = {}
 for lang in languages:
     # Load the split to test the trained model
     data_eval = dataset[lang] if lang != 'all' else data_training
@@ -120,7 +148,13 @@ for lang in languages:
     # Get slot-filling scores report with scores per slot types
     results = trainer.test(model, eval_loader, verbose=False)[0]
     report = results["slot_filling_report"]
+    performance[lang.upper()] = results["slot_filling_f1"]
     report.to_csv(Path(logger.log_dir) / f"slot_filling_report_{eval_split}_{lang.upper()}.csv")
 
+print()
+print(pd.DataFrame(performance, index=["slot f1"]).round(2))
+print()
+
 # Delete checkpoint
-Path(best_ckpt).unlink()
+if not config.train.keep_checkpoints:
+    Path(best_ckpt).unlink()

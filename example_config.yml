@@ -69,7 +69,7 @@ train:
   epochs_per_lang: 20
   # The number of workers to use for data fetching. Optional, defaults to half the number of processors.
   num_workers: 4
-  # Whether to keep intermediate checkpoints in disk. Can be deactivated to save disk space. Defaults to False.
-  keep_intermediate_checkpoints: false
-  # The sequence of languages to train on. If empty, will generate a random sequence of all available languages.
-  sequence: ['DE', 'FR', 'PT', 'HI', 'ES', 'TR', 'EN', 'JA', 'ZH']
+  # Whether to keep checkpoints in disk. Can be deactivated to save disk space. Defaults to True.
+  keep_checkpoints: true
+  # The languages to train the model on.
+  languages: ['DE', 'FR', 'PT', 'HI', 'ES', 'TR', 'EN', 'JA', 'ZH']
