@@ -1,5 +1,5 @@
-# Cross-lingual Transfer in Natural Language Understanding
-Companion repository for the paper "A Study of Cross-lingual Transfer in Continual Natural Language Understanding".
+# Cross-lingual Transfer in Continual Natural Language Understanding
+Companion repository for the paper "On Cross-lingual Transfer in Continual Natural Language Understanding".
 
 This project contains all the scripts and information needed to reproduce the experiments presented in the paper.
 
@@ -14,8 +14,8 @@ Paper under review.
 1) Create `conda` environment:
 
 ```shell
-conda create -n ctnlu python==3.8
-conda activate ctnlu
+conda create -n ctcnlu python==3.8
+conda activate ctcnlu
 ```
 
 2) Install PyTorch (>= 1.7.1) following the instructions of the [docs](https://pytorch.org/get-started/locally/#start-locally)
@@ -109,12 +109,13 @@ The list of sequences used to report our results can be found in `sequences_back
 
 Summary of each continual experiment:
 
-| experiment's name | sequences used                                                          | value(s) used from `P` |
-| ----------------- | ----------------------------------------------------------------------- | ---------------------- |
-| forward transfer  | `sequences_forward_transfer.lst`                                        | `P_{L,L}`              |
-| backward transfer | `sequences_backward_transfer.lst`                                       | `P_{1,L}`              |
-| language position | `sequences_forward_transfer.lst`<br />`sequences_backward_transfer.lst` | `P_{i, i}` (all)       |
-| zero-shot         | `sequences_backward_transfer.lst`                                       | `P_{i, 1}`             |
+| experiment's name       | sequences used                     | value(s) used from `P`  |
+| ----------------------- | ---------------------------------- | ----------------------- |
+| Forward Transfer (FT)   | `sequences_forward_transfer.lst`   | `P_{L,L}`               |
+| Backward Transfer (BT)  | `sequences_backward_transfer.lst`  | `P_{1,L}`               |
+| Language Position FT    | `sequences_forward_transfer.lst`   | `P_{i, i}`              |
+| Language Position BT    | `sequences_backward_transfer.lst`  | `P_{1, i}`              |
+| Zero-shot               | `sequences_backward_transfer.lst`  | `P_{i, 1}`              |
 
 To run a continual experiment:
 ```shell script
