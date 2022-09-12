@@ -14,11 +14,11 @@ Paper under review.
 1) Create `conda` environment:
 
 ```shell
-conda create -n ctcnlu python==3.8
+conda create -n ctcnlu python=3.8
 conda activate ctcnlu
 ```
 
-2) Install PyTorch (>= 1.7.1) following the instructions of the [docs](https://pytorch.org/get-started/locally/#start-locally)
+2) Install PyTorch (>=1.7.1) following the instructions of the [docs](https://pytorch.org/get-started/locally/#start-locally)
 
 3) Install dependencies:
 ```shell
