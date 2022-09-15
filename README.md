@@ -1,12 +1,13 @@
-# Cross-lingual Transfer in Continual Natural Language Understanding
-Companion repository for the paper "On Cross-lingual Transfer in Continual Natural Language Understanding".
+# Analyzing BERT Cross-lingual Transfer Capabilities in Continual Sequence Labeling
+
+Companion repository for the paper "Analyzing BERT Cross-lingual Transfer Capabilities in Continual Sequence Labeling".
 
 This project contains all the scripts and information needed to reproduce the experiments presented in the paper.
 
 ## Citation
 
 ```bibtex
-Paper under review.
+Paper accepted at MMMPIE workshop (COLING 2022). Awaiting publication.
 ```
 
 ## Installation
